@@ -5,8 +5,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-
 @RequiredArgsConstructor
 public class PlaceholderHook extends PlaceholderExpansion {
 
@@ -29,11 +27,18 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(@NotNull Player player, @NotNull String identifier) {
-        if (identifier.toLowerCase(Locale.ROOT).startsWith("players_")) {
-            String server = identifier.toLowerCase(Locale.ROOT).replace("players_", "");
-            if (server.equalsIgnoreCase("total")) {
-
-            }
+        if (identifier.startsWith("players_")) {
+            String server = identifier.replace("players_", "");
+            int online = plugin.getOnlinePlayers(
+                    player,
+                    server.equalsIgnoreCase("total")
+                    ? "ALL" : server
+            );
+            return Integer.toString(online);
+        }
+        if (identifier.equalsIgnoreCase("proxy")) {
+            String currentProxy = plugin.getProxyFor(player);
+            return currentProxy == null ? "N/A" : currentProxy;
         }
         return null;
     }
