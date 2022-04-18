@@ -1,0 +1,9 @@
+name: RedisVelocity
+authors:
+  - UltimisMC Development Team
+  - Limework
+  - minecraft
+version: 1.0-SNAPSHOT
+main: io.github.invvk.redisvelocity.RedisVelocitySpigot
+depend:
+  - PlaceholderAPI
