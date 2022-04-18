@@ -1,0 +1,7 @@
+{
+  "id": "redisvelocity",
+  "name": "${project.name}",
+  "version": "${project.version}",
+  "authors": ["chunkr", "Govindas Limework","Invvk"],
+  "main": "io.github.invvk.redisvelocity.RedisVelocity"
+}
