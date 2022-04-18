@@ -1,5 +1,6 @@
 package io.github.invvk.redisvelocity;
 
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
@@ -169,7 +170,7 @@ public final class RedisVelocity {
     }
 
     public Set<UUID> getPlayersOnProxy(String server) {
-        checkArgument(getServerIds().contains(server), server + " is not a valid proxy ID");
+        Preconditions.checkArgument(getServerIds().contains(server), server + " is not a valid proxy ID");
         try (Jedis jedis = pool.getResource()) {
             Set<String> users = jedis.smembers("proxy:" + server + ":usersOnline");
             ImmutableSet.Builder<UUID> builder = ImmutableSet.builder();
@@ -250,7 +251,7 @@ public final class RedisVelocity {
     }
 
     final void sendProxyCommand(@NonNull String proxyId, @NonNull String command) {
-        checkArgument(getServerIds().contains(proxyId) || proxyId.equals("allservers"), "proxyId is invalid");
+        Preconditions.checkArgument(getServerIds().contains(proxyId) || proxyId.equals("allservers"), "proxyId is invalid");
         sendChannelMessage("redisvelocity-" + proxyId, command);
     }
 
@@ -346,7 +347,7 @@ public final class RedisVelocity {
             CommandManager manager = getServer().getCommandManager();
             if (configuration.isRegisterBungeeCommands()) {
                 manager.register(manager.metaBuilder("glist")
-                        .aliases("redisvelocity", "rglist").build(),
+                        .aliases("io/github/invvk/redisvelocity", "rglist").build(),
                         new RedisVelocityCommands.GlistCommand(this));
 
                 manager.register(manager.metaBuilder("find")
