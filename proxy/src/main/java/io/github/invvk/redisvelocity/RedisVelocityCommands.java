@@ -5,6 +5,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -391,5 +392,48 @@ class RedisVelocityCommands {
         public boolean hasPermission(Invocation invocation) {
             return invocation.source().hasPermission("redisvelocity.command.debug");
         }
+    }
+
+    public static class GotoCommand implements SimpleCommand {
+
+        private final RedisVelocity plugin;
+
+        GotoCommand(RedisVelocity plugin) {
+            this.plugin = plugin;
+        }
+
+        @Override
+        public void execute(final Invocation invocation) {
+            final CommandSource sender = invocation.source();
+            final String[] args = invocation.arguments();
+            plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    if (args.length > 0) {
+                        UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
+                        if (uuid == null) {
+                            sender.sendMessage(PLAYER_NOT_FOUND);
+                            return;
+                        }
+                        ServerInfo si = RedisVelocityAPI.getRedisVelocityApi().getServerFor(uuid);
+                        if (si != null) {
+                            player.createConnectionRequest(
+                                    plugin.getServer().getServer(si.getName()).get()
+                            ).connect();
+                        } else {
+                            sender.sendMessage(PLAYER_NOT_FOUND);
+                        }
+                    } else {
+                        sender.sendMessage(NO_PLAYER_SPECIFIED);
+                    }
+                }
+            }).schedule();
+        }
+
+        @Override
+        public boolean hasPermission(Invocation invocation) {
+            return invocation.source().hasPermission("redisvelocity.command.goto");
+        }
+
     }
 }

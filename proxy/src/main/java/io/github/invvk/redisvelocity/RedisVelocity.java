@@ -347,7 +347,7 @@ public final class RedisVelocity {
             CommandManager manager = getServer().getCommandManager();
             if (configuration.isRegisterBungeeCommands()) {
                 manager.register(manager.metaBuilder("glist")
-                        .aliases("io/github/invvk/redisvelocity", "rglist").build(),
+                        .aliases("redisvelocity", "rglist").build(),
                         new RedisVelocityCommands.GlistCommand(this));
 
                 manager.register(manager.metaBuilder("find")
@@ -384,6 +384,9 @@ public final class RedisVelocity {
 
             manager.register(manager.metaBuilder("rdebug").build(),
                     new RedisVelocityCommands.DebugCommand(this));
+
+            manager.register(manager.metaBuilder("goto").build(),
+                    new RedisVelocityCommands.GotoCommand(this));
 
             api = new RedisVelocityAPI(this);
             getServer().getEventManager().register(this, new RedisVelocityListener(this, configuration.getExemptAddresses()));
