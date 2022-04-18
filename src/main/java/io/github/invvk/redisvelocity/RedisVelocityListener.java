@@ -45,6 +45,7 @@ public class RedisVelocityListener {
 
     @Subscribe(order = PostOrder.LAST)
     public void onLogin(final LoginEvent event) {
+        String e;
         plugin.getServer().getScheduler().buildTask(plugin, new RedisCallable<Void>(plugin) {
             @Override
             protected Void call(Jedis jedis) {
