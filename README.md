@@ -1,8 +1,8 @@
-# Proxio fork of RedisBungee
-### was called the 'limework fork'
+# RedisVelocity
+### A fork for 'limework redisbungee'
 [![RedisBungee Build](https://github.com/Limework/RedisBungee/actions/workflows/maven.yml/badge.svg)](https://github.com/Limework/RedisBungee/actions/workflows/maven.yml) [![](https://jitpack.io/v/limework/redisbungee.svg)](https://jitpack.io/#limework/redisbungee)
 
-Spigot link: [click](https://www.spigotmc.org/resources/redisbungee.87700/)
+Original Spigot link: [click](https://www.spigotmc.org/resources/redisbungee.87700/)
 
 The maintainer of RedisBungee has became inactive, so we have taken the development of the plugin.
 
