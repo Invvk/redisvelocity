@@ -48,30 +48,27 @@ class RedisVelocityCommands {
         public void execute(final Invocation invocation) {
             final CommandSource sender = invocation.source();
             final String[] args = invocation.arguments();
-            plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    int count = RedisVelocityAPI.getRedisVelocityApi().getPlayerCount();
-                    TextComponent playersOnline = LegacyComponentSerializer.legacyAmpersand()
-                            .deserialize("&e" + playerPlural(count) + " currently online.");
-                    if (args.length > 0 && args[0].equals("showall")) {
-                        Multimap<String, UUID> serverToPlayers = RedisVelocityAPI.getRedisVelocityApi().getServerToPlayers();
-                        Multimap<String, String> human = HashMultimap.create();
-                        for (Map.Entry<String, UUID> entry : serverToPlayers.entries()) {
-                            human.put(entry.getKey(), plugin.getUuidTranslator().getNameFromUuid(entry.getValue(), false));
-                        }
-                        for (String server : new TreeSet<>(serverToPlayers.keySet())) {
-                            TextComponent msg = LegacyComponentSerializer
-                                    .legacyAmpersand().deserialize("&a[" + server +
-                                            "] &e(" + serverToPlayers.get(server).size() + "): &f" 
-                                            + Joiner.on(", ").join(human.get(server)));
-                            sender.sendMessage(msg);
-                        }
-                        sender.sendMessage(playersOnline);
-                    } else {
-                        sender.sendMessage(playersOnline);
-                        sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize("&eTo see all players online, use /glist showall."));
+            plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                int count = RedisVelocityAPI.getRedisVelocityApi().getPlayerCount();
+                TextComponent playersOnline = LegacyComponentSerializer.legacyAmpersand()
+                        .deserialize("&e" + playerPlural(count) + " currently online.");
+                if (args.length > 0 && args[0].equals("showall")) {
+                    Multimap<String, UUID> serverToPlayers = RedisVelocityAPI.getRedisVelocityApi().getServerToPlayers();
+                    Multimap<String, String> human = HashMultimap.create();
+                    for (Map.Entry<String, UUID> entry : serverToPlayers.entries()) {
+                        human.put(entry.getKey(), plugin.getUuidTranslator().getNameFromUuid(entry.getValue(), false));
                     }
+                    for (String server : new TreeSet<>(serverToPlayers.keySet())) {
+                        TextComponent msg = LegacyComponentSerializer
+                                .legacyAmpersand().deserialize("&a[" + server +
+                                        "] &e(" + serverToPlayers.get(server).size() + "): &f"
+                                        + Joiner.on(", ").join(human.get(server)));
+                        sender.sendMessage(msg);
+                    }
+                    sender.sendMessage(playersOnline);
+                } else {
+                    sender.sendMessage(playersOnline);
+                    sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize("&eTo see all players online, use /glist showall."));
                 }
             }).schedule();
         }
@@ -94,26 +91,23 @@ class RedisVelocityCommands {
             final CommandSource sender = invocation.source();
             final String[] args = invocation.arguments();
             
-            plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    if (args.length > 0) {
-                        UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
-                        if (uuid == null) {
-                            sender.sendMessage(PLAYER_NOT_FOUND);
-                            return;
-                        }
-                        ServerInfo si = RedisVelocityAPI.getRedisVelocityApi().getServerFor(uuid);
-                        if (si != null) {
-                            TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize(
-                                    "&b" + args[0] + " is on " + si.getName() + ".");
-                            sender.sendMessage(message);
-                        } else {
-                            sender.sendMessage(PLAYER_NOT_FOUND);
-                        }
-                    } else {
-                        sender.sendMessage(NO_PLAYER_SPECIFIED);
+            plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                if (args.length > 0) {
+                    UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
+                    if (uuid == null) {
+                        sender.sendMessage(PLAYER_NOT_FOUND);
+                        return;
                     }
+                    ServerInfo si = RedisVelocityAPI.getRedisVelocityApi().getServerFor(uuid);
+                    if (si != null) {
+                        TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize(
+                                "&b" + args[0] + " is on " + si.getName() + ".");
+                        sender.sendMessage(message);
+                    } else {
+                        sender.sendMessage(PLAYER_NOT_FOUND);
+                    }
+                } else {
+                    sender.sendMessage(NO_PLAYER_SPECIFIED);
                 }
             }).schedule();
         }
@@ -181,27 +175,24 @@ class RedisVelocityCommands {
         public void execute(final Invocation invocation) {
             final CommandSource sender = invocation.source();
             final String[] args = invocation.arguments();
-            plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    if (args.length > 0) {
-                        UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
-                        if (uuid == null) {
-                            sender.sendMessage(PLAYER_NOT_FOUND);
-                            return;
-                        }
-                        InetAddress ia = RedisVelocityAPI.getRedisVelocityApi().getPlayerIp(uuid);
-                        if (ia != null) {
-
-                            TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize(
-                                    "&a" + args[0] + " is connected from " + ia.toString() + ".");
-                            sender.sendMessage(message);
-                        } else {
-                            sender.sendMessage(PLAYER_NOT_FOUND);
-                        }
-                    } else {
-                        sender.sendMessage(NO_PLAYER_SPECIFIED);
+            plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                if (args.length > 0) {
+                    UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
+                    if (uuid == null) {
+                        sender.sendMessage(PLAYER_NOT_FOUND);
+                        return;
                     }
+                    InetAddress ia = RedisVelocityAPI.getRedisVelocityApi().getPlayerIp(uuid);
+                    if (ia != null) {
+
+                        TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize(
+                                "&a" + args[0] + " is connected from " + ia + ".");
+                        sender.sendMessage(message);
+                    } else {
+                        sender.sendMessage(PLAYER_NOT_FOUND);
+                    }
+                } else {
+                    sender.sendMessage(NO_PLAYER_SPECIFIED);
                 }
             }).schedule();
         }
@@ -223,26 +214,23 @@ class RedisVelocityCommands {
         public void execute(final Invocation invocation) {
             final CommandSource sender = invocation.source();
             final String[] args = invocation.arguments();
-            plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    if (args.length > 0) {
-                        UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
-                        if (uuid == null) {
-                            sender.sendMessage(PLAYER_NOT_FOUND);
-                            return;
-                        }
-                        String proxy = RedisVelocityAPI.getRedisVelocityApi().getProxy(uuid);
-                        if (proxy != null) {
-                            TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize(
-                                    "&a" + args[0] + " is connected to " + proxy + ".");
-                            sender.sendMessage(message);
-                        } else {
-                            sender.sendMessage(PLAYER_NOT_FOUND);
-                        }
-                    } else {
-                        sender.sendMessage(NO_PLAYER_SPECIFIED);
+            plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                if (args.length > 0) {
+                    UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
+                    if (uuid == null) {
+                        sender.sendMessage(PLAYER_NOT_FOUND);
+                        return;
                     }
+                    String proxy = RedisVelocityAPI.getRedisVelocityApi().getProxy(uuid);
+                    if (proxy != null) {
+                        TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize(
+                                "&a" + args[0] + " is connected to " + proxy + ".");
+                        sender.sendMessage(message);
+                    } else {
+                        sender.sendMessage(PLAYER_NOT_FOUND);
+                    }
+                } else {
+                    sender.sendMessage(NO_PLAYER_SPECIFIED);
                 }
             }).schedule();
         }
@@ -329,36 +317,33 @@ class RedisVelocityCommands {
             final CommandSource sender = invocation.source();
             final String[] args = invocation.arguments();
 
-            plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    String proxy = args.length >= 1 ? args[0] : RedisVelocity.getConfiguration().getServerId();
-                    if (!plugin.getServerIds().contains(proxy)) {
-                        sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(("&e" + proxy + " is not a valid proxy. See /serverids for valid proxies.")));
-                        return;
-                    }
-                    Set<UUID> players = RedisVelocityAPI.getRedisVelocityApi().getPlayersOnProxy(proxy);
-                    TextComponent playersOnline = LegacyComponentSerializer.legacyAmpersand().deserialize(("&e" + playerPlural(players.size()) + " currently on proxy " + proxy + "."));
-                    if (args.length >= 2 && args[1].equals("showall")) {
-                        Multimap<String, UUID> serverToPlayers = RedisVelocityAPI.getRedisVelocityApi().getServerToPlayers();
-                        Multimap<String, String> human = HashMultimap.create();
-                        for (Map.Entry<String, UUID> entry : serverToPlayers.entries()) {
-                            if (players.contains(entry.getValue())) {
-                                human.put(entry.getKey(), plugin.getUuidTranslator().getNameFromUuid(entry.getValue(), false));
-                            }
+            plugin.getServer().getScheduler().buildTask(plugin, () -> {
+                String proxy = args.length >= 1 ? args[0] : RedisVelocity.getConfiguration().getServerId();
+                if (!plugin.getServerIds().contains(proxy)) {
+                    sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(("&e" + proxy + " is not a valid proxy. See /serverids for valid proxies.")));
+                    return;
+                }
+                Set<UUID> players = RedisVelocityAPI.getRedisVelocityApi().getPlayersOnProxy(proxy);
+                TextComponent playersOnline = LegacyComponentSerializer.legacyAmpersand().deserialize(("&e" + playerPlural(players.size()) + " currently on proxy " + proxy + "."));
+                if (args.length >= 2 && args[1].equals("showall")) {
+                    Multimap<String, UUID> serverToPlayers = RedisVelocityAPI.getRedisVelocityApi().getServerToPlayers();
+                    Multimap<String, String> human = HashMultimap.create();
+                    for (Map.Entry<String, UUID> entry : serverToPlayers.entries()) {
+                        if (players.contains(entry.getValue())) {
+                            human.put(entry.getKey(), plugin.getUuidTranslator().getNameFromUuid(entry.getValue(), false));
                         }
-                        for (String server : new TreeSet<>(human.keySet())) {
-                            TextComponent text = LegacyComponentSerializer.legacyAmpersand().deserialize(
-                                    "&c[" + server + "] &e(" + human.get(server).size() + "): &f" +
-                                            Joiner.on(", ").join(human.get(server))
-                            );
-                            sender.sendMessage(text);
-                        }
-                        sender.sendMessage(playersOnline);
-                    } else {
-                        sender.sendMessage(playersOnline);
-                        sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(("&eTo see all players online, use /plist " + proxy + " showall.")));
                     }
+                    for (String server : new TreeSet<>(human.keySet())) {
+                        TextComponent text = LegacyComponentSerializer.legacyAmpersand().deserialize(
+                                "&c[" + server + "] &e(" + human.get(server).size() + "): &f" +
+                                        Joiner.on(", ").join(human.get(server))
+                        );
+                        sender.sendMessage(text);
+                    }
+                    sender.sendMessage(playersOnline);
+                } else {
+                    sender.sendMessage(playersOnline);
+                    sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(("&eTo see all players online, use /plist " + proxy + " showall.")));
                 }
             }).schedule();
         }
@@ -379,7 +364,6 @@ class RedisVelocityCommands {
         @Override
         public void execute(final Invocation invocation) {
             final CommandSource sender = invocation.source();
-            final String[] args = invocation.arguments();
             TextComponent poolActiveStat = LegacyComponentSerializer.legacyAmpersand().deserialize("Currently active pool objects: " + plugin.getPool().getNumActive());
             TextComponent poolIdleStat = LegacyComponentSerializer.legacyAmpersand().deserialize("Currently idle pool objects: " + plugin.getPool().getNumIdle());
             TextComponent poolWaitingStat = LegacyComponentSerializer.legacyAmpersand().deserialize("Waiting on free objects: " + plugin.getPool().getNumWaiters());
@@ -407,8 +391,7 @@ class RedisVelocityCommands {
             final CommandSource sender = invocation.source();
             final String[] args = invocation.arguments();
             plugin.getServer().getScheduler().buildTask(plugin, () -> {
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
+                if (sender instanceof Player player) {
                     if (args.length > 0) {
                         UUID uuid = plugin.getUuidTranslator().getTranslatedUuid(args[0], true);
                         if (uuid == null) {

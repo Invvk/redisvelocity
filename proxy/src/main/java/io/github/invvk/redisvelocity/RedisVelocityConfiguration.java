@@ -31,7 +31,7 @@ public class RedisVelocityConfiguration {
 
         this.registerBungeeCommands = configuration.getConfig().getProperty(ProxyConfigProperties.REGISTER_BUNGEE_COMMANDS);
 
-        List<String> stringified = configuration.getConfig().getProperty(ProxyConfigProperties.EXEMPT_IP_ADDRESS);;
+        List<String> stringified = configuration.getConfig().getProperty(ProxyConfigProperties.EXEMPT_IP_ADDRESS);
         ImmutableList.Builder<InetAddress> addressBuilder = ImmutableList.builder();
 
         for (String s : stringified) {

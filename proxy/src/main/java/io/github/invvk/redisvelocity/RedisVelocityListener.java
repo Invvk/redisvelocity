@@ -45,7 +45,6 @@ public class RedisVelocityListener {
 
     @Subscribe(order = PostOrder.LAST)
     public void onLogin(final LoginEvent event) {
-        String e;
         plugin.getServer().getScheduler().buildTask(plugin, new RedisCallable<Void>(plugin) {
             @Override
             protected Void call(Jedis jedis) {
@@ -60,8 +59,6 @@ public class RedisVelocityListener {
                     Optional<Player> optional = plugin.getServer().getPlayer(event.getPlayer().getUsername());
 
                     if (optional.isPresent()) {
-                        Player player = optional.get();
-
                         event.setResult(ResultedEvent.ComponentResult.denied(ONLINE_MODE_RECONNECT));
                         return null;
                     }
@@ -145,7 +142,6 @@ public class RedisVelocityListener {
     public void onPluginMessage(final PluginMessageEvent event) {
         if ((event.getIdentifier().getId().equals("legacy:redisvelocity") || event.getIdentifier().getId()
                 .equals("RedisVelocity")) && event.getSource() instanceof ServerConnection) {
-            final String currentChannel = event.getIdentifier().getId();
             final byte[] data = Arrays.copyOf(event.getData(), event.getData().length);
             plugin.getServer().getScheduler().buildTask(plugin, () -> {
                 ByteArrayDataInput in = ByteStreams.newDataInput(data);
@@ -192,7 +188,7 @@ public class RedisVelocityListener {
                         String user = in.readUTF();
                         out.writeUTF("LastOnline");
                         out.writeUTF(user);
-                        out.writeLong(RedisVelocityAPI.getRedisVelocityApi().getLastOnline(plugin.getUuidTranslator().getTranslatedUuid(user, true)));
+                        out.writeLong(RedisVelocityAPI.getRedisVelocityApi().getLastOnline(Objects.requireNonNull(plugin.getUuidTranslator().getTranslatedUuid(user, true))));
                         break;
                     case "ServerPlayers":
                         String type1 = in.readUTF();
