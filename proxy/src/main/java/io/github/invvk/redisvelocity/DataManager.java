@@ -7,14 +7,14 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import io.github.invvk.redisvelocity.events.PlayerChangedServerNetworkEvent;
-import io.github.invvk.redisvelocity.events.PlayerJoinedNetworkEvent;
-import io.github.invvk.redisvelocity.events.PlayerLeftNetworkEvent;
-import io.github.invvk.redisvelocity.events.PubSubMessageEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
+import io.github.invvk.redisvelocity.events.PlayerChangedServerNetworkEvent;
+import io.github.invvk.redisvelocity.events.PlayerJoinedNetworkEvent;
+import io.github.invvk.redisvelocity.events.PlayerLeftNetworkEvent;
+import io.github.invvk.redisvelocity.events.PubSubMessageEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.Jedis;
@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -79,7 +78,6 @@ public class DataManager  {
         Optional<Player> optional = plugin.getServer().getPlayer(uuid);
 
         if (optional.isPresent()) {
-            Player player = optional.get();
             return RedisVelocity.getConfiguration().getServerId();
         }
 
@@ -130,13 +128,10 @@ public class DataManager  {
         }
 
         try {
-            return lastOnlineCache.get(uuid, new Callable<Long>() {
-                @Override
-                public Long call() throws Exception {
-                    try (Jedis tmpRsc = plugin.getPool().getResource()) {
-                        String result = tmpRsc.hget("player:" + uuid, "online");
-                        return result == null ? -1 : Long.parseLong(result);
-                    }
+            return lastOnlineCache.get(uuid, () -> {
+                try (Jedis tmpRsc = plugin.getPool().getResource()) {
+                    String result = tmpRsc.hget("player:" + uuid, "online");
+                    return result == null ? -1 : Long.parseLong(result);
                 }
             });
         } catch (ExecutionException e) {
@@ -180,43 +175,28 @@ public class DataManager  {
         DataManagerMessage.Action action = DataManagerMessage.Action.valueOf(jsonObject.get("action").getAsString());
 
         switch (action) {
-            case JOIN:
+            case JOIN -> {
                 final DataManagerMessage<LoginPayload> message1 = RedisVelocity.getGson().fromJson(jsonObject, new TypeToken<DataManagerMessage<LoginPayload>>() {
                 }.getType());
                 proxyCache.put(message1.getTarget(), message1.getSource());
                 lastOnlineCache.put(message1.getTarget(), (long) 0);
                 ipCache.put(message1.getTarget(), message1.getPayload().getAddress());
-                plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        plugin.getServer().getEventManager().fire(new PlayerJoinedNetworkEvent(message1.getTarget()));
-                    }
-                }).schedule();
-                break;
-            case LEAVE:
+                plugin.getServer().getScheduler().buildTask(plugin, () -> plugin.getServer().getEventManager().fire(new PlayerJoinedNetworkEvent(message1.getTarget()))).schedule();
+            }
+            case LEAVE -> {
                 final DataManagerMessage<LogoutPayload> message2 = RedisVelocity.getGson().fromJson(jsonObject, new TypeToken<DataManagerMessage<LogoutPayload>>() {
                 }.getType());
                 invalidate(message2.getTarget());
                 lastOnlineCache.put(message2.getTarget(), message2.getPayload().getTimestamp());
-                plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        plugin.getServer().getEventManager()
-                                .fire(new PlayerLeftNetworkEvent(message2.getTarget()));
-                    }
-                }).schedule();
-                break;
-            case SERVER_CHANGE:
+                plugin.getServer().getScheduler().buildTask(plugin, () -> plugin.getServer().getEventManager()
+                        .fire(new PlayerLeftNetworkEvent(message2.getTarget()))).schedule();
+            }
+            case SERVER_CHANGE -> {
                 final DataManagerMessage<ServerChangePayload> message3 = RedisVelocity.getGson().fromJson(jsonObject, new TypeToken<DataManagerMessage<ServerChangePayload>>() {
                 }.getType());
                 serverCache.put(message3.getTarget(), message3.getPayload().getServer());
-                plugin.getServer().getScheduler().buildTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        plugin.getServer().getEventManager().fire(new PlayerChangedServerNetworkEvent(message3.getTarget(), message3.getPayload().getOldServer(), message3.getPayload().getServer()));
-                    }
-                }).schedule();
-                break;
+                plugin.getServer().getScheduler().buildTask(plugin, () -> plugin.getServer().getEventManager().fire(new PlayerChangedServerNetworkEvent(message3.getTarget(), message3.getPayload().getOldServer(), message3.getPayload().getServer()))).schedule();
+            }
         }
     }
 
