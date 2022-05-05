@@ -40,7 +40,7 @@ public class ProxyConfigProperties implements SettingsHolder {
                 "PLEASE READ THE WIKI: https://github.com/Limework/RedisBungee/wiki",
                 "",
                 "The Redis server you use.",
-                "Get Redis from http://redis.io/"
+                "Get Redis from https://redis.io/"
         };
         conf.setComment("", defaultComments);
     }
