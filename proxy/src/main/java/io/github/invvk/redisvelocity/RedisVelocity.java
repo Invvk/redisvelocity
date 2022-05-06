@@ -10,14 +10,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import io.github.invvk.redisvelocity.config.ProxyConfigProperties;
-import io.github.invvk.redisvelocity.config.ProxyConfiguration;
-import io.github.invvk.redisvelocity.events.PubSubMessageEvent;
-import io.github.invvk.redisvelocity.util.IOUtil;
-import io.github.invvk.redisvelocity.util.LuaManager;
-import io.github.invvk.redisvelocity.util.uuid.NameFetcher;
-import io.github.invvk.redisvelocity.util.uuid.UUIDFetcher;
-import io.github.invvk.redisvelocity.util.uuid.UUIDTranslator;
 import com.squareup.okhttp.Dispatcher;
 import com.squareup.okhttp.OkHttpClient;
 import com.velocitypowered.api.command.CommandManager;
@@ -28,6 +20,14 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
+import io.github.invvk.redisvelocity.config.ProxyConfigProperties;
+import io.github.invvk.redisvelocity.config.ProxyConfiguration;
+import io.github.invvk.redisvelocity.events.PubSubMessageEvent;
+import io.github.invvk.redisvelocity.util.IOUtil;
+import io.github.invvk.redisvelocity.util.LuaManager;
+import io.github.invvk.redisvelocity.util.uuid.NameFetcher;
+import io.github.invvk.redisvelocity.util.uuid.UUIDFetcher;
+import io.github.invvk.redisvelocity.util.uuid.UUIDTranslator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,8 +45,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * The RedisVelocity plugin.
@@ -231,7 +229,7 @@ public final class RedisVelocity {
                     keys.add("proxy:" + i + ":usersOnline");
                 }
                 if (!keys.isEmpty()) {
-                    Set<String> users = rsc.sunion(keys.toArray(new String[keys.size()]));
+                    Set<String> users = rsc.sunion(keys.toArray(new String[0]));
                     if (users != null && !users.isEmpty()) {
                         for (String user : users) {
                             try {
@@ -442,7 +440,7 @@ public final class RedisVelocity {
                         getLogger().warn("Player " + player + " is on the proxy but not in Redis.");
 
                         Optional<Player> pl = getServer().getPlayer(UUID.fromString(player));
-                        if (!pl.isPresent())
+                        if (pl.isEmpty())
                             continue;
 
                         Player proxiedPlayer = pl.get();
@@ -571,7 +569,7 @@ public final class RedisVelocity {
     class PubSubListener implements Runnable {
         private JedisPubSubHandler jpsh;
 
-        private Set<String> addedChannels = new HashSet<String>();
+        private Set<String> addedChannels = new HashSet<>();
 
         @Override
         public void run() {
