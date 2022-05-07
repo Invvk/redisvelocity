@@ -208,7 +208,7 @@ public final class RedisVelocity {
     }
 
     final int getCurrentCount() {
-        Long count = (Long) getPlayerCountScript.eval(ImmutableList.<String>of(), ImmutableList.<String>of());
+        Long count = (Long) getPlayerCountScript.eval(ImmutableList.of(), ImmutableList.of());
         return count.intValue();
     }
 
