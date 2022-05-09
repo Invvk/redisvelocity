@@ -33,3 +33,5 @@ shadowJar {
     relocate 'redis.clients.jedis', 'io.github.invvk.redisvelocity.jedis'
     relocate 'ch.jalu.configme', 'io.github.invvk.redisvelocity.configme'
 }
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
