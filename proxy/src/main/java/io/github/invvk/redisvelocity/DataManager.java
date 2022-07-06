@@ -99,8 +99,7 @@ public class DataManager  {
         Optional<Player> optional = plugin.getServer().getPlayer(uuid);
 
         if (optional.isPresent()) {
-            Player player = optional.get();
-            return player.getRemoteAddress().getAddress();
+            return optional.get().getRemoteAddress().getAddress();
         }
 
         try {
@@ -167,9 +166,8 @@ public class DataManager  {
         // Partially deserialize the message so we can look at the action
         JsonObject jsonObject = parser.parse(event.getMessage()).getAsJsonObject();
 
-        String source = jsonObject.get("source").getAsString();
 
-        if (source.equals(RedisVelocity.getConfiguration().getServerId()))
+        if (jsonObject.get("source").getAsString().equals(RedisVelocity.getConfiguration().getServerId()))
             return;
 
         DataManagerMessage.Action action = DataManagerMessage.Action.valueOf(jsonObject.get("action").getAsString());

@@ -62,9 +62,7 @@ public class RedisUtil {
         if (args.length < 2) {
             return false;
         }
-        int major = Integer.parseInt(args[0]);
-        int minor = Integer.parseInt(args[1]);
-        return major >= 6 && minor >= 0;
+        return Integer.parseInt(args[0]) >= 6 && Integer.parseInt(args[1]) >= 0;
     }
 
     // Ham1255: i am keeping this if some plugin uses this *IF*

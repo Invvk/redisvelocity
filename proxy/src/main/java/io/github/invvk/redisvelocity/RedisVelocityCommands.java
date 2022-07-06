@@ -255,8 +255,7 @@ class RedisVelocityCommands {
             if (args.length > 0) {
                 String command = Joiner.on(" ").skipNulls().join(args);
                 RedisVelocityAPI.getRedisVelocityApi().sendProxyCommand(command);
-                TextComponent message = LegacyComponentSerializer.legacyAmpersand().deserialize("&aSent the command /" + command + " to all proxies.");
-                sender.sendMessage(message);
+                sender.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize("&aSent the command /" + command + " to all proxies."));
             } else {
                 sender.sendMessage(NO_COMMAND_SPECIFIED);
             }
@@ -277,10 +276,8 @@ class RedisVelocityCommands {
 
         @Override
         public void execute(final Invocation invocation) {
-            final CommandSource sender = invocation.source();
-
             TextComponent textComponent = LegacyComponentSerializer.legacyAmpersand().deserialize("&eYou are on " + RedisVelocityAPI.getRedisVelocityApi().getServerId() + ".");
-            sender.sendMessage(textComponent);
+            invocation.source().sendMessage(textComponent);
         }
 
         @Override
@@ -293,10 +290,8 @@ class RedisVelocityCommands {
 
         @Override
         public void execute(final Invocation invocation) {
-            final CommandSource sender = invocation.source();
-
             TextComponent textComponent = LegacyComponentSerializer.legacyAmpersand().deserialize(("&eAll server IDs: " + Joiner.on(", ").join(RedisVelocityAPI.getRedisVelocityApi().getAllServers())));
-            sender.sendMessage(textComponent);
+            invocation.source().sendMessage(textComponent);
         }
 
         @Override

@@ -62,8 +62,7 @@ public class RedisVelocityAPI {
      * @return a {@link ServerInfo} for the server the player is on.
      */
     public final ServerInfo getServerFor(@NonNull UUID player) {
-        String server = plugin.getDataManager().getServer(player);
-        return plugin.getServer().getServer(server).get().getServerInfo();
+        return plugin.getServer().getServer(plugin.getDataManager().getServer(player)).get().getServerInfo();
     }
 
     /**

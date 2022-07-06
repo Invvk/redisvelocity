@@ -13,8 +13,7 @@ public class LuaManager {
 
     public Script createScript(String script) {
         try (Jedis jedis = plugin.getPool().getResource()) {
-            String hash = jedis.scriptLoad(script);
-            return new Script(script, hash);
+            return new Script(script, jedis.scriptLoad(script));
         }
     }
 

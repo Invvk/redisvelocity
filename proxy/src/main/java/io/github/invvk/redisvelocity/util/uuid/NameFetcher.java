@@ -21,8 +21,7 @@ public class NameFetcher {
     private static OkHttpClient httpClient;
 
     public static List<String> nameHistoryFromUuid(UUID uuid) throws IOException {
-        String url = "https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names";
-        Request request = new Request.Builder().url(url).get().build();
+        Request request = new Request.Builder().url("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names").get().build();
         ResponseBody body = httpClient.newCall(request).execute().body();
         String response = body.string();
         body.close();
