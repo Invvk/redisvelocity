@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'io.github.invvk'
-version '2.0.0'
+version "$parent.version"
 
 repositories {
     mavenCentral()
@@ -35,3 +35,5 @@ shadowJar {
 }
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
+
+assemble.dependsOn('shadowJar')
