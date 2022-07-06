@@ -505,6 +505,8 @@ public final class RedisVelocity {
                 // Create the pool...
                 JedisPoolConfig config = new JedisPoolConfig();
                 config.setMaxTotal(pconfig.getConfig().getProperty(ProxyConfigProperties.MAXIMUM_CONNECTIONS));
+                if (finalRedisPassword == null)
+                        return new JedisPool(config, redisServer, redisPort, 0, useSSL);
                 return new JedisPool(config, redisServer, redisPort, 0, finalRedisPassword, useSSL);
             });
 
