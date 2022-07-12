@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-group 'io.github.invvk'
+group 'com.github.UltimisMC'
 version '2.0.1'
 
 allprojects {
