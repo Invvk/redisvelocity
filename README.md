@@ -1,6 +1,6 @@
 # RedisVelocity
 ### A fork for 'limework redisbungee'
-[![RedisBungee Build](https://github.com/UltimisMC/RedisVelocity/actions/workflows/gradle.yml/badge.svg)](https://github.com/UltimisMC/RedisVelocity/actions/workflows/gradle.yml) [![](https://jitpack.io/v/ultimismc/redisvelocity.svg)](https://jitpack.io/#ultimismc/redisvelocity)
+[![RedisVelocity Build](https://github.com/UltimisMC/RedisVelocity/actions/workflows/gradle.yml/badge.svg)](https://github.com/UltimisMC/RedisVelocity/actions/workflows/gradle.yml) [![](https://jitpack.io/v/ultimismc/redisvelocity.svg)](https://jitpack.io/#ultimismc/redisvelocity)
 
 This plugin is used for Velocity network since it lacks from multi proxy synchronization plugins.
 
