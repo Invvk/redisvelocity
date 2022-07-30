@@ -203,11 +203,11 @@ public final class RedisVelocity {
         }
     }
 
-    final int getCount() {
+    int getCount() {
         return globalPlayerCount.get();
     }
 
-    final int getCurrentCount() {
+    int getCurrentCount() {
         Long count = (Long) getPlayerCountScript.eval(ImmutableList.of(), ImmutableList.of());
         return count.intValue();
     }
@@ -220,7 +220,7 @@ public final class RedisVelocity {
         return builder.build();
     }
 
-    final Set<UUID> getPlayers() {
+    Set<UUID> getPlayers() {
         ImmutableSet.Builder<UUID> setBuilder = ImmutableSet.builder();
         if (pool != null) {
             try (Jedis rsc = pool.getResource()) {
@@ -248,12 +248,12 @@ public final class RedisVelocity {
         return setBuilder.build();
     }
 
-    final void sendProxyCommand(@NonNull String proxyId, @NonNull String command) {
+    void sendProxyCommand(@NonNull String proxyId, @NonNull String command) {
         Preconditions.checkArgument(getServerIds().contains(proxyId) || proxyId.equals("allservers"), "proxyId is invalid");
         sendChannelMessage("redisvelocity-" + proxyId, command);
     }
 
-    final void sendChannelMessage(String channel, String message) {
+    void sendChannelMessage(String channel, String message) {
         try (Jedis jedis = pool.getResource()) {
             jedis.publish(channel, message);
         } catch (JedisConnectionException e) {
@@ -571,7 +571,7 @@ public final class RedisVelocity {
     class PubSubListener implements Runnable {
         private JedisPubSubHandler jpsh;
 
-        private Set<String> addedChannels = new HashSet<>();
+        private final Set<String> addedChannels = new HashSet<>();
 
         @Override
         public void run() {
