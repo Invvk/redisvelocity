@@ -31,7 +31,7 @@ jobs:
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v2
         with:
-          name: SNAPSHOT
+          name: RedisVelocity-SNAPSHOT
           path: "${{ github.workspace }}/Core/build/libs/RedisVelocity.jar"
   publish:
     name: Publish API module to maven central
