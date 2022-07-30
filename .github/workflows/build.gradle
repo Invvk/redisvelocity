@@ -1,0 +1,59 @@
+name: Build & Upload & Publish
+
+on:
+  pull_request:
+    branches: ['**']
+  push:
+    branches: ['main']
+
+jobs:
+  build:
+    name: Test, Compile, and Upload Snapshot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 16
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '16'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Build with Gradle
+        run: gradle build
+
+      - name: Upload snapshot
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v2
+        with:
+          name: SNAPSHOT
+          path: "${{ github.workspace }}/Core/build/libs/RedisVelocity.jar"
+  publish:
+    name: Publish API module to maven central
+    needs: [build]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Setup JDK 16'
+        uses: actions/setup-java@v3
+        with:
+          java-version: '16'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+
+      - name: Publish with Gradle
+        env:
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
+        run: gradle publishToSonatype --no-daemon
