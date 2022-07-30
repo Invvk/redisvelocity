@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group 'io.github.invvk'
+version "$parent.version"
+
+repositories {
+    mavenCentral()
+    maven {
+        name 'PaperMC'
+        url 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
+    implementation 'redis.clients:jedis:4.2.3'
+    implementation 'org.apache.commons:commons-pool2:2.11.1'
+    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+    implementation 'ch.jalu:configme:1.3.0'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
+}
+
+shadowJar {
+    archiveBaseName.set('RedisVelocity')
+    archiveClassifier.set('')
+
+    exclude 'META-INF/**'
+    exclude 'LICENSE'
+
+    relocate 'redis.clients.jedis', 'io.github.invvk.redisvelocity.jedis'
+    relocate 'ch.jalu.configme', 'io.github.invvk.redisvelocity.configme'
+}
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+assemble.dependsOn('shadowJar')
